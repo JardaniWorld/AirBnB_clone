@@ -35,5 +35,6 @@ create all unittests to validate all our classes and storage engine
 	 - Change directories into the repository: `cd AirBnB_clone`
 
 ## Authors
-Ezekiel Alene
-John
+Ezekiel Alene | [GitHub](https://github.com/ezkielmisage)
+
+John Agbo  | [GitHub](https://github.com/jardaniworld)
