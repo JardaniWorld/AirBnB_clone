@@ -3,7 +3,6 @@
 * [Description](#description)
 * [Description of the command interpreter](#description_of_the_command_interpreter)
 * [Installation](#installation)
-* [Usage](#usage)
 * [Authors](#authors)
 
 ## Description
@@ -36,4 +35,5 @@ create all unittests to validate all our classes and storage engine
 	 - Change directories into the repository: `cd AirBnB_clone`
 
 ## Authors
-
+Ezekiel Alene
+John
