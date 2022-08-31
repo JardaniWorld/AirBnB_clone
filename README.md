@@ -1,7 +1,7 @@
 # AirBnB_clone
 ## Table of Contents
 * [Description](#description)
-* [Requirements](#requirements)
+* [Description of the command interpreter](#description_of_the_command_interpreter)
 * [Installation](#installation)
 * [Usage](#usage)
 * [Authors](#authors)
@@ -19,7 +19,7 @@ A website (the front-end) that shows the final product to everybody: static and 
 A database or files that store data (data = objects)
 An API that provides a communication interface between the front-end and your data (retrieve, create, delete, update them)
 
-##Description_of_the_command_interpreter
+## Description_of_the_command_interpreter
 This is the first step towards building your first full web application: the AirBnB clone. This first step is very important because you will use what you build during this project with all other following projects: HTML/CSS templating, database storage, API, front-end integration…
 
 Each task is linked and will help you to:
@@ -29,5 +29,3 @@ create a simple flow of serialization/deserialization: Instance <-> Dictionary <
 create all classes used for AirBnB (User, State, City, Place…) that inherit from BaseModel
 create the first abstracted storage engine of the project: File storage.
 create all unittests to validate all our classes and storage engine
-
-
