@@ -29,3 +29,11 @@ create a simple flow of serialization/deserialization: Instance <-> Dictionary <
 create all classes used for AirBnB (User, State, City, Place…) that inherit from BaseModel
 create the first abstracted storage engine of the project: File storage.
 create all unittests to validate all our classes and storage engine
+
+## Installation
+
+	 - Clone this repository: `https://github.com/ezkielmisgae/AirBnB_clone.git`.
+	 - Change directories into the repository: `cd AirBnB_clone`
+
+## Authors
+
