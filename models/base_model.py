@@ -59,7 +59,7 @@ class BaseModel:
         """Representation of the class for the User
 
         Example:
-            $ bm - BaseModel()
+            $ bm = BaseModel()
             $ print(bm)
 
             This method prints the content of the Base Model
@@ -70,7 +70,7 @@ class BaseModel:
         """
         return '[{0}] ({1}) {2}'.format(
                 self.__class__.__name__, self.id, self.__dict__
-                )
+            )
 
     def save(self):
         """This method updates a Base Model instance
