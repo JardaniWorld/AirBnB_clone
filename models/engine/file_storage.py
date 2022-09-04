@@ -14,9 +14,12 @@ from models.place import Place
 from models.review import Review
 from models.user import User
 
-
 class FileStorage:
-    """ FileStorage class to manage instances """
+     """Represent an abstracted storage engine.
+    Attributes:
+        __file_path (str): The name of the file to save objects to.
+        __objects (dict): A dictionary of instantiated objects.
+    """
 
     __file_path = 'file.json'
     __objects = {}
@@ -26,7 +29,7 @@ class FileStorage:
         return type(self).__objects
 
     def new(self, obj):
-        """ put object in __objects """
+        """ put object in __objects. """
         k = "{}.{}".format(obj.__class__.__name__, obj.id)
         type(self).__objects[k] = obj
 
@@ -51,4 +54,4 @@ class FileStorage:
                 for k, v in temp.items():
                     self.new(clslist[v['__class__']](**v))
         except FileNotFoundError:
-            pass
+            return
