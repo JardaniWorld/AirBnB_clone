@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 """
 Contains the TestReviewDocs classes
 """
@@ -10,7 +11,6 @@ from models.base_model import BaseModel
 import pep8
 import unittest
 Review = review.Review
-
 
 class TestReviewDocs(unittest.TestCase):
     """Tests to check the documentation and style of Review class"""
