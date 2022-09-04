@@ -20,7 +20,11 @@ class BaseModel:
     """Class Base Model"""
 
     def __init__(self, *args, **kwargs):
-        """Constructor"""
+          """Initialize a new BaseModel.
+        Args:
+            *args (any): Unused.
+            **kwargs (dict): Key/value pairs of attributes.
+        """
         datenow = datetime.now()
         if kwargs:
             for k, v in kwargs.items():
