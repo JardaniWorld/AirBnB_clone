@@ -1,15 +1,5 @@
 #!/usr/bin/python3
-# Encoding: utf-8
-"""This defines the Base Model Module
-This module establishes a reference `base_model`
-from which other classes of the Airbnb clone project
-inherit from. With this, it is possible to extract information
-such as: A Universal Unique Identifier (UUID), the date and
-time in which a class was created and updated, a standard format
-to print the class content, a way to save the data created from
-the instances and finally the representation of all the keys
-and values of an instance.
-"""
+'''Base Model Module'''
 
 import models
 from uuid import uuid4
@@ -20,11 +10,7 @@ class BaseModel:
     """Class Base Model"""
 
     def __init__(self, *args, **kwargs):
-          """Initialize a new BaseModel.
-        Args:
-            *args (any): Unused.
-            **kwargs (dict): Key/value pairs of attributes.
-        """
+        """Constructor"""
         datenow = datetime.now()
         if kwargs:
             for k, v in kwargs.items():
