@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 import cmd
 import models
 from models.base_model import BaseModel
@@ -10,14 +11,12 @@ from models.review import Review
 from models.user import User
 """entry point for hbnb console"""
 
-
 class HBNBCommand(cmd.Cmd):
     """ hbnb shell """
     prompt = '(hbnb) '
     clslist = {'BaseModel': BaseModel, 'State': State, 'City': City,
                'Amenity': Amenity, 'Place': Place, 'Review': Review,
                'User': User}
-
     def emptyline(self):
         """empty line"""
         pass
