@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 # Encoding: utf-8
+
 """This script defines Console Module
 This module controls all databases.
 Can create, modify and delete instances.
 """
+
 import cmd
 import re
 from shlex import split
