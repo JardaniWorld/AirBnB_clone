@@ -1,237 +1,341 @@
 #!/usr/bin/python3
-# Encoding: utf-8
-"""Unittest for base model module.
-This unittest is a collection of possible edge cases
-on which this module should not be expected to fail,
-and cases on which it is expected to fail.
-"""
+'''Unit Test For Base Model'''
 
-from datetime import datetime
-from models.base_model import BaseModel
-from models.city import City
-from models.place import Place
-from models.amenity import Amenity
-from models.state import State
-from models.review import Review
-import os
-import pep8
 import unittest
-import uuid
+import pep8
+import sys
+import io
+import sys
+import models
+import json
+from os import remove
+from os.path import isfile
+from models.base_model import BaseModel
+from datetime import datetime
 
 
-class TestBaseModel(unittest.TestCase):
-    """this will test the base model class"""
+def setUpModule():
+    '''Set Stuff Up'''
+    models.storage._FileStorage__objects.clear()
+    try:
+        remove(models.storage._FileStorage__file_path)
+    except:
+        pass
+
+
+def tearDownModule():
+    '''Tear Stuff Down'''
+    models.storage._FileStorage__objects.clear()
+    try:
+        remove(models.storage._FileStorage__file_path)
+    except:
+        pass
+
+
+class Test_01_BaseModel_Basics(unittest.TestCase):
+    '''Tests If BaseModel Meets Basic Specs'''
+
+    def test_01_file_existence(self):
+        '''Test if file exists'''
+        self.assertTrue(isfile('models/base_model.py'),
+                        'Missing base_model.py file')
+
+    def test_02_pep8_compliance(self):
+        '''Test if file meets pep8 specs'''
+        pep8style = pep8.StyleGuide(quiet=True)
+        result = pep8style.check_files(['models/base_model.py'])
+        self.assertEqual(result.total_errors, 0,
+                         "Fails PEP8 compliance")
+
+    def test_03_method_existence(self):
+        '''Test for method existence'''
+        clsdir = dir(__import__('models').base_model.BaseModel)
+        self.assertIn('__init__', clsdir, "Missing __init__ method")
+        self.assertIn('__str__', clsdir, "Missing __str__ method")
+        self.assertIn('save', clsdir, "Missing save method")
+        self.assertIn('to_dict', clsdir, "Missing to_dict method")
+
+    def test_04_instantiation(self):
+        '''Test for failed instantiation'''
+        try:
+            obj1 = BaseModel()
+            obj2 = BaseModel('Test')
+            obj3 = BaseModel('id')
+            obj4 = BaseModel(888)
+            obj5 = BaseModel(id="1234")
+            obj6 = BaseModel([1, 'A', 3])
+            obj7 = BaseModel({'A': 1, 'B': 2})
+            obj8 = BaseModel((2, 'B', 6))
+            obj9 = BaseModel({7, 'HI', 10})
+            obj10 = BaseModel(None)
+            obj11 = BaseModel(-666)
+            obj12 = BaseModel(9.8)
+            obj13 = BaseModel(float('nan'))
+            obj14 = BaseModel(float('inf'))
+            obj15 = BaseModel('')
+            obj16 = BaseModel([])
+            obj17 = BaseModel([-5])
+            obj18 = BaseModel({})
+            obj19 = BaseModel({'u': [6, 7]})
+        except:
+            self.fail("Failed BaseModel instantiation")
+        finally:
+            del obj1
+            del obj2
+            del obj3
+            del obj4
+            del obj5
+            del obj6
+            del obj7
+            del obj8
+            del obj9
+            del obj10
+            del obj11
+            del obj12
+            del obj13
+            del obj14
+            del obj15
+            del obj16
+            del obj17
+            del obj18
+            del obj19
+
+    def test_05_instance_class_match(self):
+        '''Test if instanced object matches class'''
+        obj1 = BaseModel()
+        self.assertIsInstance(obj1, BaseModel,
+                              "Instanced object is not BaseModel class")
+        del obj1
+
+    def test_06_attr_existence(self):
+        '''Test for public attribute existence'''
+        obj1 = BaseModel()
+        self.assertIsInstance(obj1.id, str,
+                              "Instanced object.id not a string type")
+        self.assertIsInstance(obj1.created_at, datetime,
+                              "Instanced object.created_at not datetime type")
+        self.assertIsInstance(obj1.updated_at, datetime,
+                              "Instanced object.updated_at not datetime type")
+        del obj1
+
+    def test_07_dynamic_attr(self):
+        '''Test to dynamically add attributes'''
+        obj1 = BaseModel()
+        try:
+            obj1.test1 = 'TEST'
+            obj1.test2 = [1, 2, 3]
+            obj1.test3 = {'a': 1, 'b': 2, 'c': 3}
+            obj1.test4 = (4, 5, 6)
+            obj1.test5 = {7, 8, 9}
+            obj1.test6 = None
+            obj1.test7 = 0.0
+            obj1.test8 = float('nan')
+            obj1.test9 = float('inf')
+            obj1.test10 = -666
+            obj1.test11 = ''
+            obj1.test12 = []
+            obj1.test13 = [-5]
+            obj1.test14 = {}
+            obj1.test15 = {'u': [6, 7]}
+        except:
+            self.fail("Failed to dynamically add pub inst attributes")
+        self.assertEqual(obj1.__dict__['test1'], 'TEST',
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test2'], [1, 2, 3],
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test3'], {'a': 1, 'b': 2, 'c': 3},
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test4'], (4, 5, 6),
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test5'], {7, 8, 9},
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test6'], None,
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test7'], 0.0,
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertNotEqual(obj1.__dict__['test8'], float('nan'),
+                            "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test9'], float('inf'),
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test10'], -666,
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test11'], '',
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test12'], [],
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test13'], [-5],
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test14'], {},
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(obj1.__dict__['test15'], {'u': [6, 7]},
+                         "Failed to assign value to dynamic pub inst attr")
+        self.assertEqual(len(obj1.__dict__), 18)
+        del obj1
+
+
+class Test_02_BaseModel_Constuctor(unittest.TestCase):
+    '''Test BaseModel Constructor'''
+
     @classmethod
     def setUpClass(cls):
-        """setup for the test"""
-        cls.base = BaseModel()
-        cls.base.name = "Eeeeeh"
-        cls.base.num = 20
+        '''Setup Class'''
+        cls.obj1 = BaseModel()
+        cls.obj2 = BaseModel()
+        cls.obj3 = BaseModel()
 
     @classmethod
-    def teardown(cls):
-        """at the end of the test this will tear it down"""
-        del cls.base
+    def tearDownClass(cls):
+        '''Tear Down Class'''
+        del cls.obj1
+        del cls.obj2
+        del cls.obj3
 
-    def tearDown(self):
-        """teardown"""
+    def test_01_key_existence(self):
+        '''Test for basic key existence'''
+        self.assertIn('id', dir(type(self).obj1), "Missing id key")
+        self.assertIn('created_at', dir(type(self).obj1),
+                      "Missing created_at key")
+        self.assertIn('updated_at', dir(type(self).obj1),
+                      "Missing updated_at key")
+
+    def test_02_id_generation(self):
+        '''Test for different generated IDs'''
+        self.assertNotEqual(type(self).obj1.id, type(self).obj2.id,
+                            "Fail: Same ID")
+        self.assertNotEqual(type(self).obj2.id, type(self).obj3.id,
+                            "Fail: Same ID")
+        self.assertNotEqual(type(self).obj1.id, type(self).obj3.id,
+                            "Fail: Same ID")
+
+    def test_03_datetime(self):
+        '''Test for same datetime'''
+        self.assertEqual(type(self).obj1.created_at,
+                         type(self).obj1.updated_at,
+                         "Fail: Different date times")
+        self.assertEqual(type(self).obj2.created_at,
+                         type(self).obj2.updated_at,
+                         "Fail: Different date times")
+        self.assertEqual(type(self).obj3.created_at,
+                         type(self).obj3.updated_at,
+                         "Fail: Different date times")
+
+
+class Test_04_BaseModel_Str(unittest.TestCase):
+    '''Test BaseModel __str___'''
+
+    @classmethod
+    def setUpClass(cls):
+        '''Set Up Class'''
+        cls.obj1 = BaseModel(id="1234-5678-9012",
+                             created_at="1234-05-06T01:23:45.678901",
+                             updated_at="9999-11-11T11:11:22.222222")
+        cls.god1 = '[BaseModel]'
+        cls.god2 = '(1234-5678-9012)'
+
+    @classmethod
+    def tearDownClass(cls):
+        '''Tear Down Class'''
+        del cls.obj1
+
+    def test_01_str_return_type(self):
+        '''Test __str__ return value'''
+        out = type(self).obj1.__str__()
+        self.assertIsInstance(out, str,
+                              "Error __str__ incorrect return type")
+
+    def test_02_str_format(self):
+        '''Test __str__ format'''
+        out1 = type(self).obj1.__str__().split(' ', 2)[0]
+        out2 = type(self).obj1.__str__().split(' ', 2)[1]
+        self.assertEqual(out1, type(self).god1,
+                         "Class name does not match in __str__ output")
+        self.assertEqual(out2, type(self).god2,
+                         "ID does not match in __str__ output")
+
+    def test_03_str_return_dynamic_attr_ret_type(self):
+        '''Test __str__ return with dynamic attr'''
+        type(self).obj1.test1 = 'TEST'
+        type(self).obj1.test2 = [1, 2, 3]
+        out = type(self).obj1.__str__()
+        self.assertIsInstance(out, str,
+                              "Error improper __str__ return type")
+
+
+class Test_05_BaseModel_Save(unittest.TestCase):
+    '''Test BaseModel Save Method'''
+
+    def test_01_save_datetime(self):
+        '''Check for update datetime change after save'''
+        models.storage.all().clear()
+        obj1 = BaseModel()
+        old_ua = obj1.updated_at
         try:
-            os.remove("objects.json")
-        except Exception:
-            pass
+            obj1.save()
+        except:
+            self.fail("Failed to save")
+        new_ua = obj1.updated_at
+        self.assertNotEqual(old_ua, new_ua,
+                            "Failed to change updated at datetime")
+        del obj1
 
-    def test_pep8_conformance_base_model(self):
-        """pep8 test.
-        This test is designed to make sure the Python code
-        is up to the pep8 standard.
-        """
-        syntax = pep8.StyleGuide(quit=True)
-        check = syntax.check_files(['models/base_model.py'])
-        self.assertEqual(
-            check.total_errors, 0,
-            "Found code style errors (and warnings)."
-        )
-
-    def test_base_model_id_is_string(self):
-        """UUID format testing.
-        This test is designed to check if any generated UUID
-        is correctly generated and has the propper format.
-        """
-        bm = BaseModel()
-        self.assertIsInstance(bm.id, str)
-
-    def test_base_model_uuid_good_format(self):
-        """
-        Tests if UUID is in the correct format.
-        """
-        bm = BaseModel()
-        self.assertIsInstance(uuid.UUID(bm.id), uuid.UUID)
-
-    def test_base_model_uuid_wrong_format(self):
-        """
-        Tests a badly named UUID, to confirm that it is checked.
-        """
-        bm = BaseModel()
-        bm.id = 'Monty Python'
-        warn = 'badly formed hexadecimal UUID string'
-
-        with self.assertRaises(ValueError) as msg:
-            uuid.UUID(bm.id)
-
-        self.assertEqual(warn, str(msg.exception))
-
-    def test_base_model_uuid_version(self):
-        """
-        Tests if the version of the UUID is 4
-        """
-        bm = BaseModel()
-        conv_uuid = uuid.UUID(bm.id)
-
-        self.assertEqual(conv_uuid.version, 4)
-
-    def test_base_model_different_uuid(self):
-        """
-        checks id UUID are different when different objects are created.
-        """
-        bm_one = BaseModel()
-        bm_two = BaseModel()
-        conv_uuid_one = uuid.UUID(bm_one.id)
-        conv_uuid_two = uuid.UUID(bm_two.id)
-
-        self.assertNotEqual(conv_uuid_one, conv_uuid_two)
-
-    def test_base_model_created_at_is_datetime(self):
-        """Datetime test.
-        This test is designed to check if the date and time in which a
-        class was created are correctly assigned.
-        """
-        bm = BaseModel()
-        self.assertIsInstance(bm.created_at, datetime)
-
-    def test_base_model_updated_at_is_datetime(self):
-        """Datetime test.
-        This test is designed to check if the date and time in which a
-        class is updated are correctly assigned.
-        """
-        bm = BaseModel()
-        self.assertIsInstance(bm.updated_at, datetime)
-
-    def test_creation_from_dictionary_basic(self):
-        """ This function proves in a basic way that when instantiating\
-            by passing a dictionary, it works correctly """
-        date = datetime.now()
-        dic = {"id": "7734cf23-6c89-4662-8483-284727324c77", "created_at":
-               "2020-02-17T16:32:39.023915", "updated_at":
-               "2020-02-17T16:32:39.023940", "__class__": "BaseModel"}
-        my_base = BaseModel(**dic)
-        self.assertEqual(my_base.__class__.__name__, "BaseModel")
-        self.assertEqual(my_base.id, "7734cf23-6c89-4662-8483-284727324c77")
-        self.assertEqual(type(my_base.created_at), type(date))
-        self.assertEqual(type(my_base.updated_at), type(date))
-
-    def test_creation_from_dictionary_advanced(self):
-        """ This function proves that when passing a dictionary with\
-            extra attributes, these are added correctly """
-        date = datetime.now()
-        dic = {"id": "7734cf23-6c89-4662-8483-284727324c77", "created_at":
-               "2020-02-17T16:32:39.023915", "updated_at":
-               "2020-02-17T16:32:39.023940", "__class__": "BaseModel",
-               "name": "Monty", "last_name": "Python"}
-        my_base = BaseModel(**dic)
-        self.assertEqual(my_base.__class__.__name__, "BaseModel")
-        self.assertEqual(my_base.id, "7734cf23-6c89-4662-8483-284727324c77")
-        self.assertEqual(type(my_base.created_at), type(date))
-        self.assertEqual(type(my_base.updated_at), type(date))
-        self.assertEqual(my_base.name, "Monty")
-        self.assertEqual(my_base.last_name, "Python")
-
-    def test_creation_from_dictionary_advancedx2(self):
-        """ This function proves that when passing a dictionary with\
-            extra attributes of numeric type, these are added correctly
-            and their types correspond """
-        date = datetime.now()
-        dic = {"id": "7734cf23-6c89-4662-8483-284727324c77", "created_at":
-               "2020-02-17T16:32:39.023915", "updated_at":
-               "2020-02-17T16:32:39.023940", "__class__": "BaseModel", "name":
-               "Monty", "last_name": "Python", "age": 20, "height": 1.68}
-        my_base = BaseModel(**dic)
-        self.assertEqual(my_base.__class__.__name__, "BaseModel")
-        self.assertEqual(my_base.id, "7734cf23-6c89-4662-8483-284727324c77")
-        self.assertEqual(type(my_base.created_at), type(date))
-        self.assertEqual(type(my_base.updated_at), type(date))
-        self.assertEqual(my_base.name, "Monty")
-        self.assertEqual(my_base.last_name, "Python")
-        self.assertEqual(my_base.age, 20)
-        self.assertEqual(my_base.height, 1.68)
-        self.assertEqual(type(my_base.age), int)
-        self.assertEqual(type(my_base.height), float)
-
-    def test_creation_from_dictionary_advancedx3(self):
-        """ This function proves that when passing a dictionary with\
-            extra attributes and with spaces in those of type string,\
-            these are added correctly """
-        date = datetime.now()
-        dic = {"id": "7734cf23-6c89-4662-8483-284727324c77", "created_at":
-               "2020-02-17T16:32:39.023915", "updated_at":
-               "2020-02-17T16:32:39.023940", "__class__": "BaseModel", "name":
-               "Monty", "last_name": "Python"}
-        my_base = BaseModel(**dic)
-        self.assertEqual(my_base.__class__.__name__, "BaseModel")
-        self.assertEqual(my_base.id, "7734cf23-6c89-4662-8483-284727324c77")
-        self.assertEqual(type(my_base.created_at), type(date))
-        self.assertEqual(type(my_base.updated_at), type(date))
-        self.assertEqual(my_base.name, "Monty")
-        self.assertEqual(my_base.last_name, "Python")
-        self.assertEqual(type(my_base.last_name), str)
-
-    def test_init(self):
-        """Test __init__
-        """
-        base = BaseModel()
-        self.assertTrue(hasattr(base, "id"))
-        self.assertTrue(hasattr(base, "created_at"))
-        self.assertTrue(hasattr(base, "updated_at"))
-
-    def test_to_dict(self):
-        """Tests the to_dict function."""
-        obj = BaseModel()
-        new_dict = obj.__dict__.copy()
-        new_dict["__class__"] = obj.__class__.__name__
-        new_dict["created_at"] = new_dict["created_at"].isoformat()
-        new_dict["updated_at"] = new_dict["updated_at"].isoformat()
-        comparing = obj.to_dict()
-        self.assertDictEqual(new_dict, comparing)
-
-    def test_checking_for_docstring_BaseModel(self):
-        """checking for docstrings"""
-        self.assertIsNotNone(BaseModel.__doc__)
-        self.assertIsNotNone(BaseModel.__init__.__doc__)
-        self.assertIsNotNone(BaseModel.__str__.__doc__)
-        self.assertIsNotNone(BaseModel.save.__doc__)
-        self.assertIsNotNone(BaseModel.to_dict.__doc__)
-
-    def test_method_BaseModel(self):
-        """checking if Basemodel have methods"""
-        self.assertTrue(hasattr(BaseModel, "__init__"))
-        self.assertTrue(hasattr(BaseModel, "save"))
-        self.assertTrue(hasattr(BaseModel, "to_dict"))
-
-    def test_init_BaseModel(self):
-        """test if the base is an instance of type BaseModel"""
-        self.assertTrue(isinstance(self.base, BaseModel))
-
-    def test_save_BaseModel(self):
-        """test if the save method works"""
-        self.base.save()
-        self.assertNotEqual(self.base.created_at, self.base.updated_at)
-
-    def test_to_dict_BaseModel(self):
-        """test if to_dictionary method works"""
-        base_dict = self.base.to_dict()
-        self.assertEqual(self.base.__class__.__name__, 'BaseModel')
-        self.assertIsInstance(base_dict['created_at'], str)
-        self.assertIsInstance(base_dict['updated_at'], str)
+    def test_02_save_consistency(self):
+        '''Check for consistency after save'''
+        models.storage.all().clear()
+        obj1 = BaseModel()
+        old = obj1.__dict__.copy()
+        try:
+            obj1.save()
+        except:
+            self.fail("Failed to save")
+        new = obj1.__dict__.copy()
+        del old['updated_at']
+        del new['updated_at']
+        self.assertEqual(old, new,
+                         "Failed to maintain consistency after save")
+        del obj1
 
 
-if __name__ == "__main__":
+class Test_06_BaseModel_To_Dict(unittest.TestCase):
+    '''Test BaseModel To_Dict Method'''
+
+    def setUp(self):
+        '''Set Up'''
+        self.dct1 = BaseModel().to_dict()
+        self.dct2 = BaseModel().to_dict()
+
+    def test_01_is_dict_type(self):
+        '''Test to_dict simple'''
+        self.assertIsInstance(self.dct1, dict,
+                              "Failed to_dict does not prodice dictionary"
+                              " type")
+
+    def test_02_required_keys(self):
+        '''Test for proper output format'''
+        key_list = self.dct1.keys()
+        self.assertIn('id', key_list, "Error 'id' not in to_dict() output")
+        self.assertIn('created_at', key_list,
+                      "Error 'created_by' not in to_dict() output")
+        self.assertIn('updated_at', key_list,
+                      "Error 'updated_at' not in to_dict() output")
+        self.assertIn('__class__', key_list,
+                      "Error '__class__' not in to_dict() output")
+
+    def test_03_value_type(self):
+        '''Test for proper value format'''
+        value_list = self.dct1.values()
+        for e in value_list:
+            self.assertIsInstance(e, str, "Error to_dict has non-str value")
+
+    def test_04_classname_value(self):
+        '''Test if class name is properly stored'''
+        self.assertEqual('BaseModel', self.dct1['__class__'],
+                         "Error incorrect key for BaseModel")
+
+    def test_05_different_to_dict(self):
+        '''Test for different outputs'''
+        self.assertNotEqual(self.dct1, self.dct2,
+                            "Error to_dict does not produce different output")
+
+
+if __name__ == '__main__':
     unittest.main()
