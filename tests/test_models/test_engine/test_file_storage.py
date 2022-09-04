@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 """Defines unittests for models/engine/file_storage.py.
 Unittest classes:
     TestFileStorage_instantiation
@@ -18,6 +17,7 @@ from models.place import Place
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+
 
 class TestFileStorage_instantiation(unittest.TestCase):
     """Unittests for testing instantiation of the FileStorage class."""
